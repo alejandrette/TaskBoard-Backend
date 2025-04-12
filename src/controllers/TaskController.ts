@@ -4,7 +4,7 @@ import Task from "../models/Task";
 export class TaskController {
   static getTasksById = async (req: Request, res: Response) => {
     try {
-      const tasks = await Task.find({ project: req.project.id })
+      const tasks = await Task.find({ project: req.project.id }).populate('project')
 
       res.send({ data: tasks })
     } catch (error) {
