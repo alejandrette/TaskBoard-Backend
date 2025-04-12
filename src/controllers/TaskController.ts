@@ -2,6 +2,17 @@ import type { Request, Response } from "express";
 import Task from "../models/Task";
 
 export class TaskController {
+  static getTasksById = async (req: Request, res: Response) => {
+    try {
+      const tasks = await Task.find({ project: req.project.id })
+
+      res.send({ data: tasks })
+    } catch (error) {
+      console.error(error)
+      res.status(500).json({ errors: 'Error geting projects' })
+    }
+  }
+
   static createTask = async (req: Request, res: Response) => {
     try {
       const task = new Task(req.body)
