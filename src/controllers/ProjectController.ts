@@ -49,7 +49,23 @@ export class ProjectController {
       }
 
       projects.save()
-      res.send({ data: projects })
+      res.json({ message: "Project update successfully" });
+    } catch (error) {
+      console.error(error)
+      res.status(500).json({ errors: 'Error geting projects' })
+    }
+  }
+
+  static deleteProject = async (req: Request, res: Response) => {
+    const { id } = req.params
+    try {
+      const projects = await Project.findByIdAndDelete(id)
+      if(!projects){
+        res.status(404).json({ errors: 'Project dont found' })
+        return
+      }
+
+      res.json({ message: "Project deleted successfully" });
     } catch (error) {
       console.error(error)
       res.status(500).json({ errors: 'Error geting projects' })
