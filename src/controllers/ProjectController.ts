@@ -16,6 +16,11 @@ export class ProjectController {
     const { id } = req.params
     try {
       const projects = await Project.findById(id)
+      if(!projects){
+        res.status(404).json({ errors: 'Project dont found' })
+        return
+      }
+
       res.send({ data: projects })
     } catch (error) {
       console.error(error)
@@ -31,6 +36,23 @@ export class ProjectController {
     } catch (error) {
       console.error(error)
       res.status(500).json({ errors: 'Error posting projects' })
+    }
+  }
+
+  static updateProject = async (req: Request, res: Response) => {
+    const { id } = req.params
+    try {
+      const projects = await Project.findByIdAndUpdate(id, req.body)
+      if(!projects){
+        res.status(404).json({ errors: 'Project dont found' })
+        return
+      }
+
+      projects.save()
+      res.send({ data: projects })
+    } catch (error) {
+      console.error(error)
+      res.status(500).json({ errors: 'Error geting projects' })
     }
   }
 }

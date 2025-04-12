@@ -24,4 +24,16 @@ router.post('/',
   ProjectController.createProject
 )
 
+router.put('/:id', 
+  param('id').isMongoId().withMessage('ID no valid'),
+  body('projectName')
+    .notEmpty().withMessage('The project name is empty'),
+  body('clientName')
+    .notEmpty().withMessage('The client name is empty'),
+  body('description')
+    .notEmpty().withMessage('The description is empty'),
+  handleInputErrors,
+  ProjectController.updateProject
+)
+
 export default router
