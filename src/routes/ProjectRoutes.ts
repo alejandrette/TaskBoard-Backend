@@ -3,6 +3,7 @@ import { ProjectController } from "../controllers/ProjectController";
 import { body, param } from "express-validator";
 import { handleInputErrors } from "../middleware/validation";
 import { TaskController } from "../controllers/TaskController";
+import { validateProjectExist } from "../middleware/project";
 
 const router = Router()
 
@@ -54,6 +55,7 @@ router.post('/:projectId/tasks',
   body('description')
     .notEmpty().withMessage('The description is empty'),
   handleInputErrors,
+  validateProjectExist,
   TaskController.createTask
 )
 
