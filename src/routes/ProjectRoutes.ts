@@ -52,7 +52,15 @@ router.get('/:projectId/tasks',
   param('projectId').isMongoId().withMessage('ID no valid'),
   handleInputErrors,
   validateProjectExist,
-  TaskController.getTasksById
+  TaskController.getProjectTasks
+)
+
+router.get('/:projectId/tasks/:taskId',
+  param('projectId').isMongoId().withMessage('ID no valid'),
+  param('taskId').isMongoId().withMessage('ID no valid'),
+  handleInputErrors,
+  validateProjectExist,
+  TaskController.getTaskById
 )
 
 router.post('/:projectId/tasks',
