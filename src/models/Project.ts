@@ -5,7 +5,7 @@ export type ProjectType = Document & {
   projectName: string;
   clientName: string;
   description: string;
-  task: PopulatedDoc<TaskType & Document>[]
+  tasks: PopulatedDoc<TaskType & Document>[]
 }
 
 const ProjectSchema: Schema = new Schema({
@@ -24,7 +24,7 @@ const ProjectSchema: Schema = new Schema({
     require: true,
     trim: true,
   },
-  task: [{
+  tasks: [{
     type: Types.ObjectId,
     ref: 'Task'
   }]
