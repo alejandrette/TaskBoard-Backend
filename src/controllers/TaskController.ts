@@ -48,4 +48,26 @@ export class TaskController {
       res.status(500).json({ errors: 'Error posting projects' })
     }
   }
+
+  static updateTask = async (req: Request, res: Response) => {
+    try {
+      const { taskId } = req.params
+      const task = await Task.findByIdAndUpdate(taskId, req.body, { new: true })
+
+      if(!task){
+        res.status(404).json({ errors: 'Task dont found' })
+        return
+      }
+
+      if(task.project.toString() !== req.project.id){
+        res.status(400).json({ errors: 'Task doesnt project' })
+        return
+      }
+
+      res.json({ message: "Task update successfully" })
+    } catch (error) {
+      console.error(error)
+      res.status(500).json({ errors: 'Error geting projects' })
+    }
+  }
 }

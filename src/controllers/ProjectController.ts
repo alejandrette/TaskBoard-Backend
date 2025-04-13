@@ -42,13 +42,12 @@ export class ProjectController {
   static updateProject = async (req: Request, res: Response) => {
     const { id } = req.params
     try {
-      const projects = await Project.findByIdAndUpdate(id, req.body)
+      const projects = await Project.findByIdAndUpdate(id, req.body, { new: true })
       if(!projects){
         res.status(404).json({ errors: 'Project dont found' })
         return
       }
 
-      projects.save()
       res.json({ message: "Project update successfully" });
     } catch (error) {
       console.error(error)
