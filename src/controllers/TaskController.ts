@@ -1,4 +1,4 @@
-import type { Request, Response } from "express";
+import { request, type Request, type Response } from "express";
 import Task from "../models/Task";
 
 export class TaskController {
@@ -65,6 +65,26 @@ export class TaskController {
       }
 
       res.json({ message: "Task update successfully" })
+    } catch (error) {
+      console.error(error)
+      res.status(500).json({ errors: 'Error geting projects' })
+    }
+  }
+
+  static deleteTask = async (req: Request, res: Response) => {
+    try {
+      const { taskId } = req.params
+      const task = await Task.findById(taskId)
+
+      if(!task){
+        res.status(404).json({ errors: 'Task dont found' })
+        return
+      }
+      
+      req.project.tasks = req.project.tasks.filter(task => task.toString() !== taskId)          
+      await Promise.allSettled([task.deleteOne(), req.project.save()])
+
+      res.json({ message: "Task delete successfully" })
     } catch (error) {
       console.error(error)
       res.status(500).json({ errors: 'Error geting projects' })
