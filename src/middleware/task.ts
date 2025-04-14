@@ -24,3 +24,11 @@ export async function validateTaskExist(req: Request, res: Response, next: NextF
     res.status(500).json({ errors: 'Error' })
   }
 }
+
+export function taskBelongsToProject(req: Request, res: Response, next: NextFunction){
+  if(req.task.project.toString() !== req.project.id){
+    res.status(400).json({ errors: 'Task doesnt project' })
+    return
+  }
+  next()
+}

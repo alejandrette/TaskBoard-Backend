@@ -15,11 +15,6 @@ export class TaskController {
 
   static getTaskById = async (req: Request, res: Response) => {
     try {
-      if(req.task.project.toString() !== req.project.id){
-        res.status(400).json({ errors: 'Task doesnt project' })
-        return
-      }
-
       res.json(req.task)
     } catch (error) {
       console.error(error)
@@ -43,11 +38,6 @@ export class TaskController {
 
   static updateTask = async (req: Request, res: Response) => {
     try {
-      if(req.task.project.toString() !== req.project.id){
-        res.status(400).json({ errors: 'Task doesnt project' })
-        return
-      }
-
       res.json({ message: "Task update successfully" })
     } catch (error) {
       console.error(error)
@@ -69,10 +59,6 @@ export class TaskController {
 
   static updateStatus = async (req: Request, res: Response) => {
     try {
-      if(req.task.project.toString() !== req.project.id){
-        res.status(400).json({ errors: 'Task doesnt project' })
-        return
-      }
       const { status } = req.body
       req.task.status = status
       await req.task.save()
