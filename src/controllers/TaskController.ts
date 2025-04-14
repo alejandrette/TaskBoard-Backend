@@ -15,20 +15,12 @@ export class TaskController {
 
   static getTaskById = async (req: Request, res: Response) => {
     try {
-      const { taskId } = req.params
-      const task = await Task.findById(taskId)
-
-      if(!task){
-        res.status(404).json({ errors: 'Task dont found' })
-        return
-      }
-
-      if(task.project.toString() !== req.project.id){
+      if(req.task.project.toString() !== req.project.id){
         res.status(400).json({ errors: 'Task doesnt project' })
         return
       }
 
-      res.json({ task })
+      res.json(req.task)
     } catch (error) {
       console.error(error)
       res.status(500).json({ errors: 'Error geting projects' })
@@ -51,15 +43,7 @@ export class TaskController {
 
   static updateTask = async (req: Request, res: Response) => {
     try {
-      const { taskId } = req.params
-      const task = await Task.findByIdAndUpdate(taskId, req.body, { new: true })
-
-      if(!task){
-        res.status(404).json({ errors: 'Task dont found' })
-        return
-      }
-
-      if(task.project.toString() !== req.project.id){
+      if(req.task.project.toString() !== req.project.id){
         res.status(400).json({ errors: 'Task doesnt project' })
         return
       }
@@ -73,16 +57,8 @@ export class TaskController {
 
   static deleteTask = async (req: Request, res: Response) => {
     try {
-      const { taskId } = req.params
-      const task = await Task.findById(taskId)
-
-      if(!task){
-        res.status(404).json({ errors: 'Task dont found' })
-        return
-      }
-      
-      req.project.tasks = req.project.tasks.filter(task => task.toString() !== taskId)          
-      await Promise.allSettled([task.deleteOne(), req.project.save()])
+      req.project.tasks = req.project.tasks.filter(task => task.toString() !== req.task.id.toString())          
+      await Promise.allSettled([req.task.deleteOne(), req.project.save()])
 
       res.json({ message: "Task delete successfully" })
     } catch (error) {
@@ -93,21 +69,13 @@ export class TaskController {
 
   static updateStatus = async (req: Request, res: Response) => {
     try {
-      const { taskId } = req.params
-      const task = await Task.findById(taskId)
-      
-      if(!task){
-        res.status(404).json({ errors: 'Task dont found' })
-        return
-      }
-      
-      if(task.project.toString() !== req.project.id){
+      if(req.task.project.toString() !== req.project.id){
         res.status(400).json({ errors: 'Task doesnt project' })
         return
       }
       const { status } = req.body
-      task.status = status
-      await task.save()
+      req.task.status = status
+      await req.task.save()
 
       res.json({ message: "Status update successfully" })
     } catch (error) {
