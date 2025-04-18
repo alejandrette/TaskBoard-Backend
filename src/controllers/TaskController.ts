@@ -38,6 +38,12 @@ export class TaskController {
 
   static updateTask = async (req: Request, res: Response) => {
     try {
+      const { name, description } = req.body;
+
+      req.task.name = name;
+      req.task.description = description;
+
+      await req.task.save();
       res.json({ message: "Task update successfully" })
     } catch (error) {
       console.error(error)
