@@ -1,6 +1,8 @@
 import { type Request, type Response } from "express";
 import User from "../models/User";
 import { hashPassword } from "../utils/auth";
+import Token from "../models/Token";
+import { generateToken } from "../utils/token";
 
 export class AuthController {
   static getAllUsers = async (req: Request, res: Response) => {
@@ -24,7 +26,12 @@ export class AuthController {
       }
 
       user.password = await hashPassword(password)
-      await user.save()
+
+      const token = new Token()
+      token.token = generateToken()
+      token.user = user.id
+
+      await Promise.allSettled([user.save(), token.save()])
 
       res.send('User created successfull, check your email to confirm')
     } catch (error) {
