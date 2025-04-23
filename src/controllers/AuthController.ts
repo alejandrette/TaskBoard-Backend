@@ -1,6 +1,6 @@
 import { type Request, type Response } from "express";
 import User from "../models/User";
-import { hashPassword } from "../utils/auth";
+import { checkPassword, hashPassword } from "../utils/auth";
 import Token from "../models/Token";
 import { generateToken } from "../utils/token";
 import { AuthEmail } from "../emails/AuthEmail";
@@ -55,7 +55,7 @@ export class AuthController {
       const tokenExist = await Token.findOne({token})
 
       if (!tokenExist){
-        res.status(409).json({ errors: 'The token dont exist' })
+        res.status(404).json({ errors: 'The token dont exist' })
         return
       }
 
@@ -68,6 +68,46 @@ export class AuthController {
       ])
 
       res.send('Account confirmed successfully')
+    } catch (error) {
+      console.error(error)
+      res.status(500).json({ errors: 'Error geting token' })
+    }
+  }
+
+  static login = async (req: Request, res: Response) => {
+    try {
+      const { email, password } = req.body
+      const user = await User.findOne({email})
+
+      if(!user){
+        res.status(404).json({ errors: 'User dont exist' })
+        return
+      }
+
+      if(!user.confirmed){
+        const token = new Token()
+        token.user = user.id
+        token.token = generateToken()
+        await token.save()
+
+        AuthEmail.sendConfirmationEmail({
+          email: user.email,
+          name: user.name,
+          token: token.token
+        })
+
+        res.status(401).json({ errors: 'Unconfirmed account, check your email to confirm it' })
+        return
+      }
+
+      const isPasswordCorrect = await checkPassword(password, user.password)
+      if(!isPasswordCorrect){
+        res.status(404).json({ errors: 'Incorrect password' })
+        return
+      }
+
+      res.send('Registered user')
+
     } catch (error) {
       console.error(error)
       res.status(500).json({ errors: 'Error geting token' })
