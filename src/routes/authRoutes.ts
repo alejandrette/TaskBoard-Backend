@@ -7,7 +7,7 @@ const router = Router()
 
 router.post('/create-user',
   body('email')
-      .isEmail().withMessage('The email not valid'),
+    .isEmail().withMessage('The email not valid'),
   body('name')
     .notEmpty().withMessage('The user name is empty'),
   body('password')
@@ -21,6 +21,13 @@ router.post('/create-user',
     }),
   handleInputErrors,
   AuthController.createUser
+)
+
+router.post('/confirm-user',
+  body('token')
+  .notEmpty().withMessage('The token is empty'),
+  handleInputErrors,
+AuthController.confirmUser
 )
 
 export default router

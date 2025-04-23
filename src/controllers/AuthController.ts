@@ -24,6 +24,7 @@ export class AuthController {
 
       if (userExist){
         res.status(409).json({ errors: 'The user already exists' })
+        return
       }
 
       user.password = await hashPassword(password)
@@ -44,6 +45,32 @@ export class AuthController {
     } catch (error) {
       console.error(error)
       res.status(500).json({ errors: 'Error geting users' })
+    }
+  }
+
+  static confirmUser = async (req: Request, res: Response) => {
+    try {
+      const { token } = req.body
+
+      const tokenExist = await Token.findOne({token})
+
+      if (!tokenExist){
+        res.status(409).json({ errors: 'The token dont exist' })
+        return
+      }
+
+      const user = await User.findById(tokenExist.user)
+      user.confirmed = true
+      
+      await Promise.allSettled([
+        user.save(),
+        tokenExist.deleteOne()
+      ])
+
+      res.send('Account confirmed successfully')
+    } catch (error) {
+      console.error(error)
+      res.status(500).json({ errors: 'Error geting token' })
     }
   }
 }
