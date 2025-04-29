@@ -113,4 +113,39 @@ export class AuthController {
       res.status(500).json({ errors: 'Error geting token' })
     }
   }
+
+  static requestConfirmCode = async (req: Request, res: Response) => {
+    try {
+      const { email } = req.body
+
+      const user = await User.findOne({email})
+
+      if (!user){
+        res.status(404).json({ errors: 'The user dont exist' })
+        return
+      }
+
+      if(user.confirmed){
+        res.status(403).json({ errors: 'The user is confirmed' })
+        return
+      }
+
+      const token = new Token()
+      token.token = generateToken()
+      token.user = user.id
+
+      AuthEmail.sendConfirmationEmail({
+        email: user.email,
+        name: user.name,
+        token: token.token
+      })
+
+      await Promise.allSettled([user.save(), token.save()])
+
+      res.send('Send new code')
+    } catch (error) {
+      console.error(error)
+      res.status(500).json({ errors: 'Error geting users' })
+    }
+  }
 }

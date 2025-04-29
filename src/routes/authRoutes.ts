@@ -27,7 +27,7 @@ router.post('/confirm-user',
   body('token')
     .notEmpty().withMessage('The token is empty'),
   handleInputErrors,
-AuthController.confirmUser
+  AuthController.confirmUser
 )
 
 router.post('/login',
@@ -36,7 +36,14 @@ router.post('/login',
   body('password')
     .notEmpty().withMessage('The password is empty'),
   handleInputErrors,
-AuthController.login
+  AuthController.login
+)
+
+router.post('/request-token',
+  body('email')
+    .isEmail().withMessage('The email not valid'),
+  handleInputErrors,
+  AuthController.requestConfirmCode
 )
 
 export default router
