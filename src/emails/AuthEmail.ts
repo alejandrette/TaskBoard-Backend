@@ -26,4 +26,24 @@ export class AuthEmail {
       `
     });
   }
+
+  static sendForgotPassword = async ({ email, name, token }: sendConfirmationEmailProps) => {
+    await transporter.sendMail({
+      from: 'TaskBoard 🛠 <admin@taskboard.com>',
+      to: email,
+      subject: 'Reset your password at TaskBoard',
+      text: `Hello ${name}, you requested a password reset. Use the following link and token to reset your password.`,
+      html: `
+        <div style="font-family: Arial, sans-serif; text-align: center; padding: 20px;">
+          <h2 style="color: #4F46E5;">Hello, ${name}</h2>
+          <p>You have requested to reset your password for <strong>TaskBoard</strong>.</p>
+          <p>To proceed, click the link below and use the token: <strong style="color: #4F46E5;">${token}</strong></p>
+          <a href="${process.env.FRONT_URL}/auth/reset-password?email=${email}" style="display: inline-block; margin-top: 20px; background-color: #4F46E5; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none;">
+            Reset Password
+          </a>
+          <p style="margin-top: 20px;">If you did not request this, you can safely ignore this message.</p>
+        </div>
+      `
+    });
+  }  
 }

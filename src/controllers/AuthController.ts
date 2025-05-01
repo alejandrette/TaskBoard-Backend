@@ -148,4 +148,75 @@ export class AuthController {
       res.status(500).json({ errors: 'Error geting users' })
     }
   }
+
+  static forgotPassword = async (req: Request, res: Response) => {
+    try {
+      const { email } = req.body
+
+      const user = await User.findOne({email})
+
+      if (!user){
+        res.status(404).json({ errors: 'The user dont exist' })
+        return
+      }
+
+      const token = new Token()
+      token.token = generateToken()
+      token.user = user.id
+
+      AuthEmail.sendForgotPassword({
+        email: user.email,
+        name: user.name,
+        token: token.token
+      })
+
+      await Promise.allSettled([token.save()])
+
+      res.send('Check your email for instructions')
+    } catch (error) {
+      console.error(error)
+      res.status(500).json({ errors: 'Error geting users' })
+    }
+  }
+
+  static validToken = async (req: Request, res: Response) => {
+    try {
+      const { token } = req.body
+
+      const tokenExist = await Token.findOne({token})
+
+      if (!tokenExist){
+        res.status(404).json({ errors: 'The token dont exist' })
+        return
+      }
+
+      res.send('Valid token, define the new password')
+    } catch (error) {
+      console.error(error)
+      res.status(500).json({ errors: 'Error geting token' })
+    }
+  }
+
+  static updatePassword = async (req: Request, res: Response) => {
+    try {
+      const { token } = req.params
+
+      const tokenExist = await Token.findOne({token})
+
+      if (!tokenExist){
+        res.status(404).json({ errors: 'The token dont exist' })
+        return
+      }
+
+      const user = await User.findById(tokenExist.user)
+      user.password = await hashPassword(req.body.password)
+
+      await Promise.allSettled([user.save(), tokenExist.deleteOne()])
+
+      res.send('Password changed')
+    } catch (error) {
+      console.error(error)
+      res.status(500).json({ errors: 'Error geting token' })
+    }
+  }
 }

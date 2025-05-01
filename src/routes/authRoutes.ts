@@ -1,5 +1,5 @@
 import { Router } from "express"
-import { body } from "express-validator"
+import { body, param } from "express-validator"
 import { AuthController } from "../controllers/AuthController"
 import { handleInputErrors } from "../middleware/validation"
 
@@ -44,6 +44,36 @@ router.post('/request-token',
     .isEmail().withMessage('The email not valid'),
   handleInputErrors,
   AuthController.requestConfirmCode
+)
+
+router.post('/forgot-password',
+  body('email')
+    .isEmail().withMessage('The email not valid'),
+  handleInputErrors,
+  AuthController.forgotPassword
+)
+
+router.post('/valid-token',
+  body('token')
+    .notEmpty().withMessage('The token is empty'),
+  handleInputErrors,
+  AuthController.validToken
+)
+
+router.post('/update-password/:token',
+  param('token')
+    .isNumeric().withMessage('Token not valid'),
+  body('password')
+    .isLength({min: 8}).withMessage('The password is short, min 8 character'),
+  body('password_confirmation')
+    .custom((value, {req}) => {
+      if(value !== req.body.password){
+        throw new Error('The passwords are not the same')
+      }
+      return true
+    }),
+  handleInputErrors,
+  AuthController.updatePassword
 )
 
 export default router
