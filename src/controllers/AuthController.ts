@@ -4,17 +4,9 @@ import { checkPassword, hashPassword } from "../utils/auth";
 import Token from "../models/Token";
 import { generateToken } from "../utils/token";
 import { AuthEmail } from "../emails/AuthEmail";
+import { generateJWT } from "../utils/jwt";
 
 export class AuthController {
-  static getAllUsers = async (req: Request, res: Response) => {
-    try {
-      
-    } catch (error) {
-      console.error(error)
-      res.status(500).json({ errors: 'Error geting users' })
-    }
-  }
-
   static createUser = async (req: Request, res: Response) => {
     try {
       const { password, email } = req.body
@@ -106,7 +98,8 @@ export class AuthController {
         return
       }
 
-      res.send('Registered user')
+      const token = generateJWT({id: user.id})
+      res.send(token)
 
     } catch (error) {
       console.error(error)
