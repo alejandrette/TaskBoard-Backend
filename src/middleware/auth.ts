@@ -14,7 +14,7 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
   const bearer = req.headers.authorization
 
   if(!bearer){
-    res.status(401).json({erros: 'No authorization'})
+    res.status(401).json({errors: 'No authorization'})
     return
   }
 
@@ -27,13 +27,12 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
       const user = await User.findById(decoded.id).select('id name email')
       if(user) {
         req.user = user
+        next()
       } else {
-        res.status(500).json({erros: 'Token not valid'})
+        res.status(500).json({errors: 'Token not valid'})
       }
     }
   } catch (error) {
-    res.status(500).json({erros: 'Token not valid'})
+    res.status(500).json({errors: 'Token not valid'})
   }
-
-  next()
 }

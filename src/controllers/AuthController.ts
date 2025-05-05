@@ -212,4 +212,8 @@ export class AuthController {
       res.status(500).json({ errors: 'Error geting token' })
     }
   }
+
+  static user = async (req: Request, res: Response) => {
+    res.json(req.user)
+  }
 }
