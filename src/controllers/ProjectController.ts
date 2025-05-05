@@ -4,10 +4,13 @@ import Project from "../models/Project";
 export class ProjectController {
   static getAllProjects = async (req: Request, res: Response) => {
     try {
-      const projects = await Project.find({})
+      const projects = await Project.find({
+        $or: [
+          {manager: {$in: req.user.id}}
+        ]
+      })
       res.send({ data: projects })
     } catch (error) {
-      console.error(error)
       res.status(500).json({ errors: 'Error geting projects' })
     }
   }
@@ -21,9 +24,13 @@ export class ProjectController {
         return
       }
 
+      if(projects.manager.toString() !== req.user.id){
+        res.status(404).json({ errors: 'Project dont found' })
+        return
+      }
+
       res.send({ data: projects })
     } catch (error) {
-      console.error(error)
       res.status(500).json({ errors: 'Error geting projects' })
     }
   }
@@ -32,12 +39,11 @@ export class ProjectController {
     const project = new Project(req.body)
     // Asiganr un manager
     project.manager = req.user.id
-    
+
     try {
       await project.save()
       res.send('Project created successfull')
     } catch (error) {
-      console.error(error)
       res.status(500).json({ errors: 'Error posting projects' })
     }
   }
@@ -51,9 +57,13 @@ export class ProjectController {
         return
       }
 
+      if(projects.manager.toString() !== req.user.id){
+        res.status(404).json({ errors: 'Only the manager can update' })
+        return
+      }
+
       res.json({ message: "Project update successfully" });
     } catch (error) {
-      console.error(error)
       res.status(500).json({ errors: 'Error geting projects' })
     }
   }
@@ -67,9 +77,13 @@ export class ProjectController {
         return
       }
 
+      if(projects.manager.toString() !== req.user.id){
+        res.status(404).json({ errors: 'Only the manager can delete' })
+        return
+      }
+
       res.json({ message: "Project deleted successfully" });
     } catch (error) {
-      console.error(error)
       res.status(500).json({ errors: 'Error geting projects' })
     }
   }

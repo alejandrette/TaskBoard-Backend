@@ -5,8 +5,10 @@ import { handleInputErrors } from "../middleware/validation";
 import { TaskController } from "../controllers/TaskController";
 import { validateProjectExist } from "../middleware/project";
 import { taskBelongsToProject, validateTaskExist } from "../middleware/task";
+import { authenticate } from "../middleware/auth";
 
 const router = Router()
+router.use(authenticate)
 
 // Rotes for Projects
 
@@ -29,7 +31,7 @@ router.post('/',
   ProjectController.createProject
 )
 
-router.put('/:id', 
+router.put('/:id',
   param('id').isMongoId().withMessage('ID no valid'),
   body('projectName')
     .notEmpty().withMessage('The project name is empty'),
