@@ -77,7 +77,7 @@ router.post('/update-password/:token',
   AuthController.updatePassword
 )
 
-router.post('/user',
+router.get('/user',
   authenticate,
   AuthController.user
 )
