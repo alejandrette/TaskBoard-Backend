@@ -1,4 +1,4 @@
-import { request, type Request, type Response } from "express";
+import { type Request, type Response } from "express";
 import Task from "../models/Task";
 
 export class TaskController {
