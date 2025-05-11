@@ -6,7 +6,8 @@ export class ProjectController {
     try {
       const projects = await Project.find({
         $or: [
-          {manager: {$in: req.user.id}}
+          {manager: {$in: req.user.id}},
+          {team: {$in: req.user.id}}
         ]
       })
       res.send({ data: projects })
@@ -24,7 +25,7 @@ export class ProjectController {
         return
       }
 
-      if(projects.manager.toString() !== req.user.id){
+      if(projects.manager.toString() !== req.user.id && !projects.team.includes(req.user.id)){
         res.status(404).json({ errors: 'Project dont found' })
         return
       }
