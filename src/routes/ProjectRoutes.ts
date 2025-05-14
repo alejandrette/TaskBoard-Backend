@@ -7,6 +7,7 @@ import { validateProjectExist } from "../middleware/project";
 import { taskBelongsToProject, validateTaskExist } from "../middleware/task";
 import { authenticate } from "../middleware/auth";
 import { TeamController } from "../controllers/TeamController";
+import { NoteController } from "../controllers/NoteController";
 
 const router = Router()
 router.use(authenticate)
@@ -131,6 +132,14 @@ router.get('/:projectId/team',
   param('projectId').isMongoId().withMessage('ID no valid'),
   handleInputErrors,
   TeamController.getMembers
+)
+
+// Route Notes
+router.post('/:projectId/task/:taskId/note',
+  body('content')
+    .notEmpty().withMessage('Content is empty'),
+  handleInputErrors,
+  NoteController.createNode
 )
 
 export default router
