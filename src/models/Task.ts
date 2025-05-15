@@ -19,6 +19,7 @@ export type TaskType = Document & {
     user: Types.ObjectId;
     status: TaskStatus;
   }[]
+  notes: Types.ObjectId[];
 }
 
 const TaskSchema: Schema = new Schema({
@@ -54,7 +55,11 @@ const TaskSchema: Schema = new Schema({
         default: taskStatus.PENDING
       }
     }
-  ]
+  ],
+  notes: [{
+    type: Types.ObjectId,
+    ref: 'Note'
+  }]
 }, {timestamps: true})
 
 const Task = mongoose.model<TaskType>('Task', TaskSchema)

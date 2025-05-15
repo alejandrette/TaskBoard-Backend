@@ -1,8 +1,9 @@
 import { type Request, type Response } from "express";
-import Note from "../models/Note";
+import Note, { NoteType } from "../models/Note";
+import Task from "../models/Task";
 
 export class NoteController {
-  static createNode = async(req: Request, res: Response) => {
+  static createNode = async(req: Request<{ taskId: string }, {}, { content: string }>, res: Response) => {
     try {
 
       const { content } = req.body
@@ -14,8 +15,16 @@ export class NoteController {
         createBy: userId,
         task: taskId
       })
+      
+      const task = await Task.findById(taskId)
+      if (!task) {
+        res.status(404).json({ error: "Task not found" })
+        return
+      }
 
-      note.save()
+      task.notes.push(note.id)
+
+      await Promise.allSettled([note.save(), task.save()])
 
       res.json({ message: "Note create successful" })
 
