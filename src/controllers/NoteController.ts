@@ -68,7 +68,11 @@ export class NoteController {
         return
       }
 
+      req.task.notes = req.task.notes.filter(note => note.toString() !== noteId.toString())
+
       await note.deleteOne()
+
+      Promise.allSettled([note.deleteOne(), req.task.save()])
 
       res.json({ message: "Successfully deleted note" })
 
