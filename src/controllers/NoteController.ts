@@ -42,7 +42,7 @@ export class NoteController {
   static getTaskNote = async(req: Request, res: Response) => {
     try {
 
-      const notes = await Note.find({task: req.task.id})  
+      const notes = await Note.find({task: req.task.id}).populate({ path: "createBy", select: "id name email " })
 
       res.json(notes)
 
@@ -59,12 +59,12 @@ export class NoteController {
 
       const note = await Note.findById(noteId)
       if(!note) {
-        res.status(404).json({ error: "Note not found" })
+        res.status(404).json({ errors: "Note not found" })
         return
       }
 
       if(note.createBy.toString() !== req.user.id.toString()){
-        res.status(404).json({ error: "You can't delete other people's rules" })
+        res.status(404).json({ errors: "You can't delete other people's rules" })
         return
       }
 

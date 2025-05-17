@@ -135,19 +135,19 @@ router.get('/:projectId/team',
 )
 
 // Route Notes
-router.post('/:projectId/task/:taskId/note',
+router.post('/:projectId/tasks/:taskId/note',
   body('content')
     .notEmpty().withMessage('Content is empty'),
   handleInputErrors,
   NoteController.createNode
 )
 
-router.get('/:projectId/task/:taskId/note',
+router.get('/:projectId/tasks/:taskId/note',
   handleInputErrors,
   NoteController.getTaskNote
 )
 
-router.delete('/:projectId/task/:taskId/note/:noteId',
+router.delete('/:projectId/tasks/:taskId/note/:noteId',
   param('noteId').isMongoId().withMessage('ID no valid'),
   handleInputErrors,
   NoteController.deleteNote
