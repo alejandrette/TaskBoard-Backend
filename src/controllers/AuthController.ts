@@ -216,4 +216,23 @@ export class AuthController {
   static user = async (req: Request, res: Response) => {
     res.json(req.user)
   }
+
+  static updateProfile = async (req: Request, res: Response) => {
+    try {
+      const { name, email } = req.body
+      const userId = req.user.id
+
+      const updateUser =  await User.findByIdAndUpdate(
+        userId,
+        { name, email },
+        { new: true, runValidators: true }
+      )
+
+      updateUser.save()
+      res.send('Profile update')
+    } catch (error) {
+      console.error(error)
+      res.status(500).json({ errors: 'Error update' })
+    }
+  }
 }

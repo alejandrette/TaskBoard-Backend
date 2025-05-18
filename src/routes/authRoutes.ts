@@ -82,4 +82,14 @@ router.get('/user',
   AuthController.user
 )
 
+router.patch('/profile',
+  authenticate,
+  body('name')
+    .notEmpty().withMessage('The user name is empty'),
+  body('email')
+    .isEmail().withMessage('The email not valid'),
+  handleInputErrors,
+  AuthController.updateProfile
+)
+
 export default router
