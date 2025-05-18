@@ -12,9 +12,9 @@ export class AuthController {
       const { password, email } = req.body
 
       const user = new User(req.body)
-      const userExist = await User.findOne({email})
+      const userExist = await User.findOne({ email })
 
-      if (userExist){
+      if (userExist) {
         res.status(409).json({ errors: 'The user already exists' })
         return
       }
@@ -44,16 +44,16 @@ export class AuthController {
     try {
       const { token } = req.body
 
-      const tokenExist = await Token.findOne({token})
+      const tokenExist = await Token.findOne({ token })
 
-      if (!tokenExist){
+      if (!tokenExist) {
         res.status(404).json({ errors: 'The token dont exist' })
         return
       }
 
       const user = await User.findById(tokenExist.user)
       user.confirmed = true
-      
+
       await Promise.allSettled([
         user.save(),
         tokenExist.deleteOne()
@@ -69,14 +69,14 @@ export class AuthController {
   static login = async (req: Request, res: Response) => {
     try {
       const { email, password } = req.body
-      const user = await User.findOne({email})
+      const user = await User.findOne({ email })
 
-      if(!user){
+      if (!user) {
         res.status(404).json({ errors: 'User dont exist' })
         return
       }
 
-      if(!user.confirmed){
+      if (!user.confirmed) {
         const token = new Token()
         token.user = user.id
         token.token = generateToken()
@@ -93,12 +93,12 @@ export class AuthController {
       }
 
       const isPasswordCorrect = await checkPassword(password, user.password)
-      if(!isPasswordCorrect){
+      if (!isPasswordCorrect) {
         res.status(404).json({ errors: 'Incorrect password' })
         return
       }
 
-      const token = generateJWT({id: user.id})
+      const token = generateJWT({ id: user.id })
       res.send(token)
 
     } catch (error) {
@@ -111,14 +111,14 @@ export class AuthController {
     try {
       const { email } = req.body
 
-      const user = await User.findOne({email})
+      const user = await User.findOne({ email })
 
-      if (!user){
+      if (!user) {
         res.status(404).json({ errors: 'The user dont exist' })
         return
       }
 
-      if(user.confirmed){
+      if (user.confirmed) {
         res.status(403).json({ errors: 'The user is confirmed' })
         return
       }
@@ -146,9 +146,9 @@ export class AuthController {
     try {
       const { email } = req.body
 
-      const user = await User.findOne({email})
+      const user = await User.findOne({ email })
 
-      if (!user){
+      if (!user) {
         res.status(404).json({ errors: 'The user dont exist' })
         return
       }
@@ -176,9 +176,9 @@ export class AuthController {
     try {
       const { token } = req.body
 
-      const tokenExist = await Token.findOne({token})
+      const tokenExist = await Token.findOne({ token })
 
-      if (!tokenExist){
+      if (!tokenExist) {
         res.status(404).json({ errors: 'The token dont exist' })
         return
       }
@@ -194,9 +194,9 @@ export class AuthController {
     try {
       const { token } = req.params
 
-      const tokenExist = await Token.findOne({token})
+      const tokenExist = await Token.findOne({ token })
 
-      if (!tokenExist){
+      if (!tokenExist) {
         res.status(404).json({ errors: 'The token dont exist' })
         return
       }
@@ -223,12 +223,12 @@ export class AuthController {
       const userId = req.user.id
 
       const userExist = await User.findOne({ email })
-      if(userExist && userExist.id.toString() !== req.user.id.toString()){
+      if (userExist && userExist.id.toString() !== req.user.id.toString()) {
         res.status(409).json({ errors: 'The email already exists' })
         return
       }
 
-      const updateUser =  await User.findByIdAndUpdate(
+      const updateUser = await User.findByIdAndUpdate(
         userId,
         { name, email },
         { new: true, runValidators: true }
@@ -249,7 +249,7 @@ export class AuthController {
       const userLoged = await User.findById(req.user.id)
 
       const isPasswordCorrect = await checkPassword(current_password, userLoged.password)
-      if(!isPasswordCorrect){
+      if (!isPasswordCorrect) {
         res.status(409).json({ errors: 'The current password is incorrect' })
         return
       }
@@ -257,14 +257,33 @@ export class AuthController {
       const passwordHash = await hashPassword(password)
 
       const user = await User.findByIdAndUpdate(
-        req.user.id, 
-        { password: passwordHash }, 
+        req.user.id,
+        { password: passwordHash },
         { new: true, runValidators: true }
       )
 
       user.save()
 
       res.send('Password changed')
+    } catch (error) {
+      console.error(error)
+      res.status(500).json({ errors: 'Server error updating password' })
+    }
+  }
+
+  static checkPassword = async (req: Request, res: Response) => {
+    try {
+      const { password } = req.body;
+
+      const user = await User.findById(req.user.id)
+
+      const isPasswordCorrect = await checkPassword(password, user.password)
+      if (!isPasswordCorrect) {
+        res.status(401).json({ errors: 'The password is incorrect' })
+        return
+      }
+
+      res.send('Password orrect')
     } catch (error) {
       console.error(error)
       res.status(500).json({ errors: 'Server error updating password' })
