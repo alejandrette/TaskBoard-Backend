@@ -222,6 +222,12 @@ export class AuthController {
       const { name, email } = req.body
       const userId = req.user.id
 
+      const userExist = await User.findOne({ email })
+      if(userExist && userExist.id.toString() !== req.user.id.toString()){
+        res.status(409).json({ errors: 'The email already exists' })
+        return
+      }
+
       const updateUser =  await User.findByIdAndUpdate(
         userId,
         { name, email },
@@ -233,6 +239,35 @@ export class AuthController {
     } catch (error) {
       console.error(error)
       res.status(500).json({ errors: 'Error update' })
+    }
+  }
+
+  static updateCurrentPassword = async (req: Request, res: Response) => {
+    try {
+      const { current_password, password } = req.body;
+
+      const userLoged = await User.findById(req.user.id)
+
+      const isPasswordCorrect = await checkPassword(current_password, userLoged.password)
+      if(!isPasswordCorrect){
+        res.status(409).json({ errors: 'The current password is incorrect' })
+        return
+      }
+
+      const passwordHash = await hashPassword(password)
+
+      const user = await User.findByIdAndUpdate(
+        req.user.id, 
+        { password: passwordHash }, 
+        { new: true, runValidators: true }
+      )
+
+      user.save()
+
+      res.send('Password changed')
+    } catch (error) {
+      console.error(error)
+      res.status(500).json({ errors: 'Server error updating password' })
     }
   }
 }
