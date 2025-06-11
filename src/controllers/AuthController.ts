@@ -283,7 +283,7 @@ export class AuthController {
         return
       }
 
-      res.send('Password orrect')
+      res.send('Password correct')
     } catch (error) {
       console.error(error)
       res.status(500).json({ errors: 'Server error updating password' })
